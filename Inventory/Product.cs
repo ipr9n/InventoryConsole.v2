@@ -39,7 +39,7 @@ namespace Inventory
 
         public static Product operator +(Product c1, Product c2)
         {
-            return new Product(c1._name,c1._count+c2._count,c1._price);
+            return new Product(c1._name, c1._count + c2._count, c1._price);
         }
 
         public override string ToString()
