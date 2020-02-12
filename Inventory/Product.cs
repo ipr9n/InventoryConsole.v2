@@ -4,10 +4,10 @@ namespace Inventory
 {
     public class Product
     {
-        public string _name;
-        public int _count;
-        public Guid _id { get; private set; }
-        public double _price;
+        public string _name { get; set; }
+        public int _count { get; set; }
+        public Guid _id { get; }
+        public double _price { get; set; }
 
         public Product(string name, int count, double price)
         {
@@ -25,16 +25,32 @@ namespace Inventory
             _id = id;
         }
 
-        public static bool operator ==(Product c1, Product c2)
+        protected bool Equals(Product other)
         {
-            if (c1._id == c2._id) return true;
-            else return false;
+            return _id.Equals(other._id);
         }
 
-        public static bool operator !=(Product c1, Product c2)
+        public override bool Equals(object obj)
         {
-            if (c1._id != c2._id) return true;
-            else return false;
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((Product) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return _id.GetHashCode();
+        }
+
+        public static bool operator ==(Product left, Product right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(Product left, Product right)
+        {
+            return !Equals(left, right);
         }
 
         public static Product operator +(Product c1, Product c2)

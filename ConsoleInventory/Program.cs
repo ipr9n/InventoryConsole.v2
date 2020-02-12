@@ -7,6 +7,11 @@ namespace ConsoleInventory
 {
     class Program
     {
+
+        private static MenuItems _chooseItem = 0;
+        static Storage warehouse = new Storage();
+        static Storage basket = new Storage();
+
         private enum MenuItems
         {
             AddToWarehouse,
@@ -23,9 +28,12 @@ namespace ConsoleInventory
             {MenuItems.ClearBasket, "Clear basket"}
         };
 
-        private static MenuItems _chooseItem = 0;
-        static Storage warehouse = new Storage();
-        static Storage basket = new Storage();
+        private enum MenuId
+        {
+            MainMenu,
+            WarehouseMenu,
+            BasketMenu
+        }
 
         static void Main(string[] args)
         {
@@ -75,16 +83,9 @@ namespace ConsoleInventory
             CheckKey();
         }
 
-        private enum MenuId
-        {
-            MainMenu,
-            WarehouseMenu,
-            BasketMenu
-        }
-
         private static void MakeChoise(ConsoleKey key, MenuId id)
         {
-            if (_chooseItem < (MenuItems)_mainMenuItems.Count - 1 && key == ConsoleKey.DownArrow && id == MenuId.MainMenu)
+            if ((int)_chooseItem < _mainMenuItems.Count - 1 && key == ConsoleKey.DownArrow && id == MenuId.MainMenu)
             {
                 _chooseItem++;
                 ShowMenu();
@@ -111,7 +112,7 @@ namespace ConsoleInventory
                 _chooseItem++;
                 ShowBasketMenu();
             }
-            else if (_chooseItem > 0 && key == ConsoleKey.UpArrow && id == MenuId.MainMenu)
+            else if (_chooseItem > 0 && key == ConsoleKey.UpArrow && id == MenuId.BasketMenu)
             {
                 _chooseItem--;
                 ShowBasketMenu();
@@ -124,7 +125,7 @@ namespace ConsoleInventory
 
         private static void MenuAction(MenuItems chooseItem)
         {
-            switch ((MenuItems)chooseItem)
+            switch (chooseItem)
             {
                 case MenuItems.AddToWarehouse:
                     warehouse.AddItem(MakeSomeProduct());
@@ -141,7 +142,6 @@ namespace ConsoleInventory
                     ClearBasket();
                     break;
             }
-
             ShowMenu();
         }
 
@@ -158,12 +158,12 @@ namespace ConsoleInventory
                     if ((int)_chooseItem == i)
                     {
                         Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine($"--->\t{basketProduct.ToString()}");
+                        Console.WriteLine($"--->\t{basketProduct}");
                         Console.ForegroundColor = ConsoleColor.Green;
                     }
                     else
                     {
-                        Console.WriteLine($"\t{basketProduct.ToString()}");
+                        Console.WriteLine($"\t{basketProduct}");
 
                     }
                 }
@@ -236,7 +236,7 @@ namespace ConsoleInventory
             List<Product> _basketProducts = basket.GetStorageItems();
 
             Console.Clear();
-            Console.WriteLine(_basketProducts[itemIndex].ToString());
+            Console.WriteLine(_basketProducts[itemIndex]);
             Console.WriteLine("Write count to remove");
 
             int tempCount = GetCount();
@@ -266,12 +266,12 @@ namespace ConsoleInventory
                         if ((int)_chooseItem == i)
                         {
                             Console.ForegroundColor = ConsoleColor.Cyan;
-                            Console.WriteLine($"--->\t{warehouseProduct.ToString()}");
+                            Console.WriteLine($"--->\t{warehouseProduct}");
                             Console.ForegroundColor = ConsoleColor.Green;
                         }
                         else
                         {
-                            Console.WriteLine($"\t{warehouseProduct.ToString()}");
+                            Console.WriteLine($"\t{warehouseProduct}");
 
                         }
                     }
@@ -337,7 +337,7 @@ namespace ConsoleInventory
             List<Product> warehouseProducts = warehouse.GetStorageItems();
 
             Console.Clear();
-            Console.WriteLine(warehouseProducts[itemIndex].ToString());
+            Console.WriteLine(warehouseProducts[itemIndex]);
             Console.WriteLine("Write count to add");
 
             int tempCount = GetCount();
@@ -403,8 +403,5 @@ namespace ConsoleInventory
 
             return product;
         }
-
-
-
     }
 }
