@@ -7,7 +7,6 @@ namespace ConsoleInventory
 {
     class Program
     {
-
         private static MenuItems _chooseItem = 0;
         static Storage warehouse = new Storage();
         static Storage basket = new Storage();
@@ -58,8 +57,79 @@ namespace ConsoleInventory
                     Console.WriteLine($"\t{_mainMenuItems[menuItem]}");
                 }
             }
-
             CheckKey();
+        }
+
+        public static void ShowBasketMenu()
+        {
+            List<Product> basketProducts = basket.GetStorageItems();
+            Console.Clear();
+
+            if (basketProducts.Count > 0)
+            {
+                for (var i = 0; i < basketProducts.Count; i++)
+                {
+                    var basketProduct = basketProducts[i];
+                    if ((int)_chooseItem == i)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine($"--->\t{basketProduct}");
+                        Console.ForegroundColor = ConsoleColor.Green;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"\t{basketProduct}");
+                    }
+                }
+
+                double cost = basketProducts.Sum(product => product._count * product._price);
+                Console.Write($"The total cost of everything in the basket: {cost}\n" +
+                              $"Press delete to remove item from basket\n" +
+                              $"Press escape to return in main menu");
+                CheckBasketKey();
+            }
+            else
+            {
+                Console.WriteLine("Empty basket.\nPress any key to return");
+                Console.ReadKey();
+            }
+        }
+
+        private static void ShowWarehouseMenu()
+        {
+            Console.Clear();
+            List<Product> warehouseProducts = warehouse.GetStorageItems();
+
+            if (warehouseProducts.Count > 0)
+            {
+                for (var i = 0; i < warehouseProducts.Count; i++)
+                {
+                    var warehouseProduct = warehouseProducts[i];
+                    if ((int)_chooseItem == i)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine($"--->\t{warehouseProduct}");
+                        Console.ForegroundColor = ConsoleColor.Green;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"\t{warehouseProduct}");
+
+                    }
+                }
+                Console.WriteLine("Press up and down arrow to navigate.\n" +
+                                  "Press delete to delete item\n" +
+                                  "Press 1 to add item count\n" +
+                                  "Press 2 to add item in basket\n" +
+                                  "Press 3 to change item price\n" +
+                                  "Press escape to return in main menu");
+                CheckWarehouseKey();
+            }
+            else
+            {
+                Console.WriteLine("Empty warehouse\nPress any key to return");
+                Console.ReadKey();
+            }
         }
 
         private static void CheckKey()
@@ -79,8 +149,73 @@ namespace ConsoleInventory
                     MenuAction(_chooseItem);
                     break;
             }
-
             CheckKey();
+        }
+
+        private static void CheckBasketKey()
+        {
+            switch (Console.ReadKey().Key)
+            {
+                case ConsoleKey.DownArrow:
+                    MakeChoise(ConsoleKey.DownArrow, MenuId.BasketMenu);
+                    break;
+
+                case ConsoleKey.UpArrow:
+                    MakeChoise(ConsoleKey.UpArrow, MenuId.BasketMenu);
+                    break;
+                case ConsoleKey.Escape:
+                    _chooseItem = 0;
+                    break;
+                case ConsoleKey.Delete:
+                    RemoveFromBasket((int)_chooseItem);
+                    ShowBasketMenu();
+                    break;
+                default:
+                    CheckBasketKey();
+                    break;
+            }
+        }
+
+        private static void CheckWarehouseKey()
+        {
+            switch (Console.ReadKey().Key)
+            {
+                case ConsoleKey.DownArrow:
+                    MakeChoise(ConsoleKey.DownArrow, MenuId.WarehouseMenu);
+                    break;
+
+                case ConsoleKey.UpArrow:
+                    MakeChoise(ConsoleKey.UpArrow, MenuId.WarehouseMenu);
+                    break;
+                case ConsoleKey.Escape:
+                    _chooseItem = 0;
+                    break;
+                case ConsoleKey.Delete:
+                    Console.Clear();
+                    Console.WriteLine("Write count number to remove");
+                    warehouse.RemoveItemCount((int)_chooseItem, GetCount());
+                    ShowWarehouseMenu();
+                    break;
+                case ConsoleKey.D1:
+                    Console.Clear();
+                    Console.WriteLine("Write count number to add");
+                    warehouse.AddItemCount((int)_chooseItem, GetCount());
+                    ShowWarehouseMenu();
+                    break;
+                case ConsoleKey.D2:
+                    AddItemToBasket((int)_chooseItem);
+                    ShowWarehouseMenu();
+                    break;
+                case ConsoleKey.D3:
+                    Console.Clear();
+                    Console.WriteLine("Write new price");
+                    warehouse.ChangeItemPrice((int)_chooseItem, GetPrice());
+                    ShowWarehouseMenu();
+                    break;
+                default:
+                    CheckWarehouseKey();
+                    break;
+            }
         }
 
         private static void MakeChoise(ConsoleKey key, MenuId id)
@@ -145,67 +280,6 @@ namespace ConsoleInventory
             ShowMenu();
         }
 
-        public static void ShowBasketMenu()
-        {
-            List<Product> basketProducts = basket.GetStorageItems();
-            Console.Clear();
-
-            if (basketProducts.Count > 0)
-            {
-                for (var i = 0; i < basketProducts.Count; i++)
-                {
-                    var basketProduct = basketProducts[i];
-                    if ((int)_chooseItem == i)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine($"--->\t{basketProduct}");
-                        Console.ForegroundColor = ConsoleColor.Green;
-                    }
-                    else
-                    {
-                        Console.WriteLine($"\t{basketProduct}");
-
-                    }
-                }
-
-                double cost = basketProducts.Sum(product => product._count * product._price);
-                Console.Write($"The total cost of everything in the basket: {cost}\n" +
-                              $"Press delete to remove item from basket\n" +
-                              $"Press escape to return in main menu");
-                CheckBasketKey();
-            }
-            else
-            {
-                Console.WriteLine("Empty basket.\nPress any key to return");
-                Console.ReadKey();
-            }
-
-        }
-
-        private static void CheckBasketKey()
-        {
-            switch (Console.ReadKey().Key)
-            {
-                case ConsoleKey.DownArrow:
-                    MakeChoise(ConsoleKey.DownArrow, MenuId.BasketMenu);
-                    break;
-
-                case ConsoleKey.UpArrow:
-                    MakeChoise(ConsoleKey.UpArrow,MenuId.BasketMenu);
-                    break;
-                case ConsoleKey.Escape:
-                    _chooseItem = 0;
-                    break;
-                case ConsoleKey.Delete:
-                    RemoveFromBasket((int)_chooseItem);
-                    ShowBasketMenu();
-                    break;
-                default:
-                    CheckBasketKey();
-                    break;
-            }
-        }
-
         public static void ClearBasket()
         {
             List<Product> basketProducts = basket.GetStorageItems();
@@ -227,7 +301,6 @@ namespace ConsoleInventory
                 Console.WriteLine("Basket is already clear. Press any key to continue");
                 Console.ReadKey();
             }
-
             basket.Clear();
         }
 
@@ -251,85 +324,6 @@ namespace ConsoleInventory
 
             Console.WriteLine("Item return to inventory. Press any key to continue");
             Console.ReadKey();
-        }
-
-        private static void ShowWarehouseMenu()
-        {
-            Console.Clear();
-            List<Product> warehouseProducts = warehouse.GetStorageItems();
-
-                if (warehouseProducts.Count > 0)
-                {
-                    for (var i = 0; i < warehouseProducts.Count; i++)
-                    {
-                        var warehouseProduct = warehouseProducts[i];
-                        if ((int)_chooseItem == i)
-                        {
-                            Console.ForegroundColor = ConsoleColor.Cyan;
-                            Console.WriteLine($"--->\t{warehouseProduct}");
-                            Console.ForegroundColor = ConsoleColor.Green;
-                        }
-                        else
-                        {
-                            Console.WriteLine($"\t{warehouseProduct}");
-
-                        }
-                    }
-                    Console.WriteLine("Press up and down arrow to navigate.\n" +
-                                      "Press delete to delete item\n" +
-                                      "Press 1 to add item count\n" +
-                                      "Press 2 to add item in basket\n" +
-                                      "Press 3 to change item price\n" +
-                                      "Press escape to return in main menu");
-                    CheckWarehouseKey();
-                }
-                else
-                {
-                    Console.WriteLine("Empty warehouse\nPress any key to return");
-                    Console.ReadKey();
-                }
-        }
-
-        private static void CheckWarehouseKey()
-        {
-            switch (Console.ReadKey().Key)
-            {
-                case ConsoleKey.DownArrow:
-                    MakeChoise(ConsoleKey.DownArrow,MenuId.WarehouseMenu);
-                    break;
-
-                case ConsoleKey.UpArrow:
-                    MakeChoise(ConsoleKey.UpArrow, MenuId.WarehouseMenu);
-                    break;
-                case ConsoleKey.Escape:
-                    _chooseItem = 0;
-                    break;
-                case ConsoleKey.Delete:
-                    Console.Clear();
-                    Console.WriteLine("Write count number to remove");
-                    warehouse.RemoveItemCount((int)_chooseItem,GetCount());
-                    ShowWarehouseMenu();
-                    break;
-                case ConsoleKey.D1:
-                    Console.Clear();
-                    Console.WriteLine("Write count number to add");
-                    warehouse.AddItemCount((int)_chooseItem,GetCount());
-                    ShowWarehouseMenu();
-                    break;
-                case ConsoleKey.D2:
-                    AddItemToBasket((int)_chooseItem);
-                    ShowWarehouseMenu();
-                    break;
-                case ConsoleKey.D3:
-                    Console.Clear();
-                    Console.WriteLine("Write new price");
-                    warehouse.ChangeItemPrice((int)_chooseItem,GetPrice());
-                    ShowWarehouseMenu();
-                    break;
-                default:
-                    CheckWarehouseKey();
-                    break;
-            }
         }
 
         private static void AddItemToBasket(int itemIndex)

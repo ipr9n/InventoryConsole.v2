@@ -4,7 +4,7 @@ namespace Inventory
 {
     public class Product
     {
-        public string _name { get; set; }
+        public string _name { get; }
         public int _count { get; set; }
         public Guid _id { get; }
         public double _price { get; set; }
